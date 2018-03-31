@@ -25,17 +25,12 @@ public class MainActivity extends AppCompatActivity {
 
     int currentQuestionIndexNumber = 0;
     int numberOfQuestionsAnswered = 0;
-
-    public enum questionTypeENUM {
-        MULTIPLE_CHOICE, SINGLE_CHOICE, FREE_TEXT
-    }
+    /** Initialize the randomNumberClass for our getRandom function */
+    Random randomNumberClass = new Random();
 
     public int numberOfQuestions() {
         return questions.size();
     }
-
-    /** Initialize the randomNumberClass for our getRandom function */
-    Random randomNumberClass = new Random();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
     /** Updates the quiz screen to display the proper fields for a given question **/
     public void showQuestion (int questionNumber) {
 
-        /** TODO: Hide non-essential quiz type views **/
+        /** Hide all quiz types **/
         View view = findViewById(R.id.quiz_multiple_choice);
         view.setVisibility(View.GONE);
         view = findViewById(R.id.quiz_single_choice);
@@ -252,5 +247,9 @@ public class MainActivity extends AppCompatActivity {
     public boolean answerCorrect() {
         /** TODO: Check answers **/
         return true;
+    }
+
+    public enum questionTypeENUM {
+        MULTIPLE_CHOICE, SINGLE_CHOICE, FREE_TEXT
     }
 }
