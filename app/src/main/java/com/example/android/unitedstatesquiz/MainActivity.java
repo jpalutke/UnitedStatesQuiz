@@ -1,43 +1,77 @@
 package com.example.android.unitedstatesquiz;
 
+import android.content.Context;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import java.util.ArrayList;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
-    ArrayList<String> questions = new ArrayList<> (0);
-    ArrayList<String> choiceA = new ArrayList<> (0);
-    ArrayList<String> choiceB = new ArrayList<> (0);
-    ArrayList<String> choiceC = new ArrayList<> (0);
-    ArrayList<String> choiceD = new ArrayList<> (0);
-    ArrayList<questionTypeENUM> questionFormat = new ArrayList<> (0);
-
-    int currentQuestionIndexNumber = 0;
-    int numberOfQuestionsAnswered = 0;
-    /** Initialize the randomNumberClass for our getRandom function */
-    Random randomNumberClass = new Random();
-
-    public int numberOfQuestions() {
-        return questions.size();
-    }
+    private static final String[] stateNames = {
+            "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware",
+            "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana",
+            "Maine", "Maryland", "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana",
+            "Nebraska", "Nevada", "New Hampshire", "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota",
+            "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", "Tennessee",
+            "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"};
+    private static final String[] capitalNames = {
+            "Montgomery", "Juneau", "Phoenix", "Little Rock", "Sacramento", "Denver", "Hartford", "Dover", "Tallahassee",
+            "Atlanta", "Honolulu", "Boise", "Springfield", "Indianapolis", "Des Moines", "Topeka", "Frankfort",
+            "Baton Rouge", "Augusta", "Annapolis", "Boston", "Lansing", "St Paul", "Jackson", "Jefferson City", "Helena",
+            "Lincoln", "Carson City", "Concord", "Trenton", "Santa Fe", "Albany", "Raleigh", "Bismark", "Columbus",
+            "Oklahoma City", "Salem", "Harrisburg", "Providence", "Columbia", "Pierre", "Nashville", "Austin",
+            "Salt Lake City", "Montpelier", "Richmond", "Olympia", "Charleston", "Madison", "Cheyenne"};
+    private static final int numberOfQuestionsPerQuiz = 5;
+    /*
+     * Initialize the randomNumberClass for our getRandom function
+     */
+    private final Random randomNumberClass = new Random();
+    private questionTypeENUM questionType = questionTypeENUM.SINGLE_CHOICE;
+    private int[] totalQuestionsAskedByType = {0, 0, 0};
+    private int numberOfQuestionsAnswered = 0;
+    private int numberOfQuestionsAnsweredCorrectly = 0;
+    private int stateNumber = -1;
+    private int[] questionAnswerIdx = {-1, -1, -1, -1};
+    private String questionText = "";
+    private String[] questionAnswerText = {"", "", "", ""};
+    private String scoreText = "";
+    private View multipleChoice_view;
+    private RadioGroup singleChoice_view;
+    private View freeText_view;
+    private TextView question_text_view;
+    private RadioButton radioButton1_view;
+    private RadioButton radioButton2_view;
+    private RadioButton radioButton3_view;
+    private RadioButton radioButton4_view;
+    private CheckBox checkbox1_view;
+    private CheckBox checkbox2_view;
+    private CheckBox checkbox3_view;
+    private CheckBox checkbox4_view;
+    private EditText editText_view;
+    private View quiz_view;
+    private View filter_view;
+    private View scoreboard_view;
+    private Button button_begin_view;
+    private TextView scoreText_view;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        /**
+        /*
          * Apply proper background based on display width/height
          */
         ImageView imageView = findViewById(R.id.quiz_background);
@@ -46,210 +80,440 @@ public class MainActivity extends AppCompatActivity {
         } else {
             imageView.setImageResource(R.drawable.capital_portrait);
         }
-
-        /**
-         * Hide the quiz, prev and next buttons
-         * Show the opening background and Begin button
-         *
-         **/
-        addQuestion(questionTypeENUM.SINGLE_CHOICE,"What is the capital city of Wisconsin?",
-                "Milwaukee", "*Madison", "Green Bay", "Edgar");
-        addQuestion(questionTypeENUM.MULTIPLE_CHOICE,"Which states are in the Central Time Zone?",
-                "California", "Georgia", "*Iowa", "*Mississippi");
-        addQuestion(questionTypeENUM.SINGLE_CHOICE,"What is the capital city of Utah?",
-                "Ogden", "St George", "Provo", "*Salt Lake City");
-        addQuestion(questionTypeENUM.SINGLE_CHOICE, "What is the most common state bird?", "Robin", "Bald Eagle", "Western Meadowlark", "*Northern Cardinal");
+        multipleChoice_view = findViewById(R.id.quiz_multiple_choice);
+        singleChoice_view = findViewById(R.id.quiz_single_choice);
+        freeText_view = findViewById(R.id.quiz_free_text);
+        question_text_view = findViewById(R.id.question_text);
+        radioButton1_view = findViewById(R.id.radio_button_1);
+        radioButton2_view = findViewById(R.id.radio_button_2);
+        radioButton3_view = findViewById(R.id.radio_button_3);
+        radioButton4_view = findViewById(R.id.radio_button_4);
+        checkbox1_view = findViewById(R.id.checkbox_1);
+        checkbox2_view = findViewById(R.id.checkbox_2);
+        checkbox3_view = findViewById(R.id.checkbox_3);
+        checkbox4_view = findViewById(R.id.checkbox_4);
+        editText_view = findViewById(R.id.answerText);
+        quiz_view = findViewById(R.id.quiz_layout);
+        filter_view = findViewById(R.id.background_filter);
+        scoreboard_view = findViewById(R.id.status_bar);
+        button_begin_view = findViewById(R.id.button_begin);
+        scoreText_view = findViewById(R.id.score_text);
+        scoreText_view.setText("");
     }
 
-    /** Returns an integer from 0 to upperBound-1 */
-    public int getRandom (int upperBound) {
+    /*
+     * Returns an integer from 0 to upperBound-1
+     */
+    private int getRandom(int upperBound) {
         return randomNumberClass.nextInt(upperBound);
     }
 
-    /**
-     * This will add a new question to the quiz
-     * @param questionType MULTIPLE_CHOICE, SINGLE_CHOICE
-     * @param question Text to display for the question
-     *
-     *                precede the choice with a * for correct answers
-     *                 ie: "*Correct answer"
-     * @param choice1 Text for choice 1
-     * @param choice2 Text for choice 2
-     * @param choice3 Text for choice 3
-     * @param choice4 Text for choice 4
+    /*
+     * Updates the quiz screen to display the proper fields for a given question
      */
-    public void addQuestion (questionTypeENUM questionType, String question, String choice1, String choice2, String choice3, String choice4) {
-        questions.add(question + "");
-        choiceA.add(choice1 + "");
-        choiceB.add(choice2 + "");
-        choiceC.add(choice3 + "");
-        choiceD.add(choice4 + "");
-        questionFormat.add(questionType);
-    }
+    private void showNextQuestion() {
+        /* Hide all quiz types */
+        multipleChoice_view.setVisibility(View.GONE);
+        singleChoice_view.setVisibility(View.GONE);
+        freeText_view.setVisibility(View.GONE);
 
-    /** parses the designated answer to remove the * symbol for correct answers for display purposes **/
-    public String prepareAnswer (String answerText) {
-        if (answerText.startsWith("*")) {
-            return answerText.substring(1);
-        } else {
-            return answerText;
-        }
-    }
+        /* Pick a state number to question about (zero based) */
+        stateNumber = getRandom(stateNames.length);
 
-    /** Updates the quiz screen to display the proper fields for a given question **/
-    public void showQuestion (int questionNumber) {
+        /* Create the question */
 
-        /** Hide all quiz types **/
-        View view = findViewById(R.id.quiz_multiple_choice);
-        view.setVisibility(View.GONE);
-        view = findViewById(R.id.quiz_single_choice);
-        view.setVisibility(View.GONE);
-
-
-        if (questionFormat.get(questionNumber - 1) == questionTypeENUM.SINGLE_CHOICE) {
-            /** SINGLE_CHOICE **/
-
-            /** Clear Radio Buttons **/
-            RadioGroup radioGroup = findViewById(R.id.quiz_single_choice);
-            radioGroup.clearCheck();
-
-            TextView tv = findViewById(R.id.question_text);
-            tv.setText(questions.get(questionNumber - 1));
-
-            tv = findViewById(R.id.answer_1);
-            if (choiceA.get(questionNumber - 1).length() > 0) {
-                tv.setText(prepareAnswer(choiceA.get(questionNumber - 1)));
-                tv.setVisibility(View.VISIBLE);
-            } else {
-                tv.setVisibility(View.GONE);
-            }
-
-            tv = findViewById(R.id.answer_2);
-            if (choiceB.get(questionNumber - 1).length() > 0) {
-                tv.setText(prepareAnswer(choiceB.get(questionNumber - 1)));
-                tv.setVisibility(View.VISIBLE);
-            } else {
-                tv.setVisibility(View.GONE);
-            }
-
-            tv = findViewById(R.id.answer_3);
-            if (choiceC.get(questionNumber - 1).length() > 0) {
-                tv.setText(prepareAnswer(choiceC.get(questionNumber - 1)));
-                tv.setVisibility(View.VISIBLE);
-            } else {
-                tv.setVisibility(View.GONE);
-            }
-
-            tv = findViewById(R.id.answer_4);
-            if (choiceD.get(questionNumber - 1).length() > 0) {
-                tv.setText(prepareAnswer(choiceD.get(questionNumber - 1)));
-                tv.setVisibility(View.VISIBLE);
-            } else {
-                tv.setVisibility(View.GONE);
-            }
-
-            currentQuestionIndexNumber = questionNumber;
-            View singleChoice = findViewById(R.id.quiz_single_choice);
-            singleChoice.setVisibility(View.VISIBLE);
-        } else {
-            if (questionFormat.get(questionNumber - 1) == questionTypeENUM.MULTIPLE_CHOICE) {
-                /** MULTIPLE_CHOICE **/
-
-                TextView tv = findViewById(R.id.question_text);
-                tv.setText(questions.get(questionNumber - 1));
-
-                CheckBox cb = findViewById(R.id.checkbox_1);
-                cb.setChecked(false);
-                if (choiceA.get(questionNumber - 1).length() > 0) {
-                    cb.setText(prepareAnswer(choiceA.get(questionNumber - 1)));
-                    cb.setVisibility(View.VISIBLE);
-                } else {
-                    cb.setVisibility(View.GONE);
-                }
-
-                cb = findViewById(R.id.checkbox_2);
-                cb.setChecked(false);
-                if (choiceB.get(questionNumber - 1).length() > 0) {
-                    cb.setText(prepareAnswer(choiceB.get(questionNumber - 1)));
-                    cb.setVisibility(View.VISIBLE);
-                } else {
-                    cb.setVisibility(View.GONE);
-                }
-
-                cb = findViewById(R.id.checkbox_3);
-                cb.setChecked(false);
-                if (choiceC.get(questionNumber - 1).length() > 0) {
-                    cb.setText(prepareAnswer(choiceC.get(questionNumber - 1)));
-                    cb.setVisibility(View.VISIBLE);
-                } else {
-                    cb.setVisibility(View.GONE);
-                }
-
-                cb = findViewById(R.id.checkbox_4);
-                cb.setChecked(false);
-                if (choiceD.get(questionNumber - 1).length() > 0) {
-                    cb.setText(prepareAnswer(choiceD.get(questionNumber - 1)));
-                    cb.setVisibility(View.VISIBLE);
-                } else {
-                    cb.setVisibility(View.GONE);
-                }
-
-                currentQuestionIndexNumber = questionNumber;
-                /** Show fields **/
-                LinearLayout multi = findViewById(R.id.quiz_multiple_choice);
-                multi.setVisibility(View.VISIBLE);
+        /* find least used type of question and select that type */
+        int smallestValueIdx = 0;
+        for (int i = 0; i < totalQuestionsAskedByType.length; i++) {
+            if (totalQuestionsAskedByType[i] < totalQuestionsAskedByType[smallestValueIdx]) {
+                smallestValueIdx = i;
             }
         }
-        /** Show quiz panel **/
-        View quiz = findViewById(R.id.quiz);
-        quiz.setVisibility(View.VISIBLE);
+        switch (smallestValueIdx) {
+            case 0:
+                questionType = questionTypeENUM.SINGLE_CHOICE;
+                break;
+            case 1:
+                questionType = questionTypeENUM.MULTIPLE_CHOICE;
+                break;
+            case 2:
+                questionType = questionTypeENUM.FREE_TEXT;
+                break;
+        }
+
+        switch (questionType) {
+            case SINGLE_CHOICE:
+                questionAnswerIdx = getPossibleAnswers(stateNumber);
+                questionText = "Which city is the capital of " + stateNames[stateNumber] + "?";
+                for (int idx = 0; idx < 4; idx++) {
+                    questionAnswerText[idx] = capitalNames[questionAnswerIdx[idx]];
+                }
+
+                /* Clear Radio Buttons */
+                singleChoice_view.clearCheck();
+
+                question_text_view.setText(questionText);
+                if (questionAnswerIdx[0] != -1) {
+                    radioButton1_view.setText(questionAnswerText[0]);
+                    radioButton1_view.setVisibility(View.VISIBLE);
+                } else {
+                    radioButton1_view.setVisibility(View.GONE);
+                }
+
+                if (questionAnswerIdx[1] != -1) {
+                    radioButton2_view.setText(questionAnswerText[1]);
+                    radioButton2_view.setVisibility(View.VISIBLE);
+                } else {
+                    radioButton2_view.setVisibility(View.GONE);
+                }
+
+                if (questionAnswerIdx[2] != -1) {
+                    radioButton3_view.setText(questionAnswerText[2]);
+                    radioButton3_view.setVisibility(View.VISIBLE);
+                } else {
+                    radioButton3_view.setVisibility(View.GONE);
+                }
+
+                if (questionAnswerIdx[3] != -1) {
+                    radioButton4_view.setText(questionAnswerText[3]);
+                    radioButton4_view.setVisibility(View.VISIBLE);
+                } else {
+                    radioButton4_view.setVisibility(View.GONE);
+                }
+
+                totalQuestionsAskedByType[0]++;
+                singleChoice_view.setVisibility(View.VISIBLE);
+                break;
+            case MULTIPLE_CHOICE:
+                questionAnswerIdx = getPossibleAnswers(stateNumber);
+                questionText = "Which cities are not the capital of " + stateNames[stateNumber] + "?";
+                for (int idx = 0; idx < 4; idx++) {
+                    questionAnswerText[idx] = capitalNames[questionAnswerIdx[idx]];
+                }
+                question_text_view.setText(questionText);
+
+
+                checkbox1_view.setChecked(false);
+                if (questionAnswerIdx[0] != -1) {
+                    checkbox1_view.setText(questionAnswerText[0]);
+                    checkbox1_view.setVisibility(View.VISIBLE);
+                } else {
+                    checkbox1_view.setVisibility(View.GONE);
+                }
+
+                checkbox2_view.setChecked(false);
+                if (questionAnswerIdx[1] != -1) {
+                    checkbox2_view.setText(questionAnswerText[1]);
+                    checkbox2_view.setVisibility(View.VISIBLE);
+                } else {
+                    checkbox2_view.setVisibility(View.GONE);
+                }
+
+                checkbox3_view.setChecked(false);
+                if (questionAnswerIdx[2] != -1) {
+                    checkbox3_view.setText(questionAnswerText[2]);
+                    checkbox3_view.setVisibility(View.VISIBLE);
+                } else {
+                    checkbox3_view.setVisibility(View.GONE);
+                }
+
+                checkbox4_view.setChecked(false);
+                if (questionAnswerIdx[3] != -1) {
+                    checkbox4_view.setText(questionAnswerText[3]);
+                    checkbox4_view.setVisibility(View.VISIBLE);
+                } else {
+                    checkbox4_view.setVisibility(View.GONE);
+                }
+
+                totalQuestionsAskedByType[1]++;
+                multipleChoice_view.setVisibility(View.VISIBLE);
+                break;
+            case FREE_TEXT:
+                questionText = "Which state's capital is " + capitalNames[stateNumber] + "?";
+                question_text_view.setText(questionText);
+                editText_view.setText("");
+                freeText_view.setVisibility(View.VISIBLE);
+                editText_view.requestFocus();
+                totalQuestionsAskedByType[2]++;
+                break;
+        }
+
+    /* Show quiz panel */
+        quiz_view.setVisibility(View.VISIBLE);
     }
 
-    /**
+    /*
      * BEGIN button clicked
-     * Show the quiz, prev and next buttons
      * Hide the  Begin button
      * apply filter to background image
      */
-    public void button_click (View view) {
-        View filter = findViewById(R.id.background_filter);
-        filter.setVisibility(View.VISIBLE);
-        View scoreboard = findViewById(R.id.scoreboard);
-        scoreboard.setVisibility(View.VISIBLE);
-        Button button = findViewById(R.id.button);
-        button.setVisibility(View.GONE);
-        showQuestion (getRandom(numberOfQuestions()) + 1);
+    public void button_begin_onClick(View view) {
+        filter_view.setVisibility(View.VISIBLE);
+        scoreboard_view.setVisibility(View.VISIBLE);
+        button_begin_view.setVisibility(View.GONE);
+        updateScore();
+        showNextQuestion();
     }
 
-    /**
+    private void updateScore() {
+        scoreText = "Question " + (numberOfQuestionsAnswered + 1 + " of " + numberOfQuestionsPerQuiz);
+        scoreText_view.setText(scoreText);
+    }
+
+    /*
      * Handles click of the submit_button
      * Used for Submit Answer
+     *
      * @param view
      */
-    public void submit_button_click (View view) {
-        Button button = findViewById(R.id.action_button);
-        if (button.getTag().toString().equals("answer")) {
-            if (answerCorrect()) {
-                /** TODO: display score and progress **/
-                button.setTag("next");
-                button.setText("Next Question");
+    public void button_answer_onClick(View view) {
+        hideSoftKeyboard();
+        numberOfQuestionsAnswered++;
+        if (answerCorrect()) {
+            numberOfQuestionsAnsweredCorrectly++;
+        }
+        updateScore();
+        if (numberOfQuestionsAnswered == numberOfQuestionsPerQuiz) {
+            scoreText = "You answered " + numberOfQuestionsAnsweredCorrectly + " out of " + numberOfQuestionsAnswered + " correctly.";
+            numberOfQuestionsAnsweredCorrectly = 0;
+            numberOfQuestionsAnswered = 0;
+            for (int idx = 0; idx < totalQuestionsAskedByType.length; idx++) {
+                totalQuestionsAskedByType[idx] = 0;
             }
+            filter_view.setVisibility(View.GONE);
+            quiz_view.setVisibility(View.GONE);
+            button_begin_view.setVisibility(View.VISIBLE);
+            scoreboard_view.setVisibility(View.GONE);
+            Toast.makeText(this, scoreText, Toast.LENGTH_LONG).show();
         } else {
-            if (button.getTag().toString().equals("next")) {
-                /** TODO: Advance to next question or complete Quiz **/
-                button.setTag("answer");
-                button.setText("Submit Answer");
-                showQuestion (getRandom(numberOfQuestions()) + 1);
+            showNextQuestion();
+        }
+    }
+
+    /*
+     * Checks the user's answer(s)
+     * returns TRUE if correct or FALSE if incorrect
+     */
+    private boolean answerCorrect() {
+        boolean correct = false;
+        switch (questionType) {
+            case SINGLE_CHOICE: {
+                if (radioButton1_view.isChecked() && questionAnswerIdx[0] == stateNumber) {
+                    correct = true;
+                }
+                if (radioButton2_view.isChecked() && questionAnswerIdx[1] == stateNumber) {
+                    correct = true;
+                }
+                if (radioButton3_view.isChecked() && questionAnswerIdx[2] == stateNumber) {
+                    correct = true;
+                }
+                if (radioButton4_view.isChecked() && questionAnswerIdx[3] == stateNumber) {
+                    correct = true;
+                }
+                break;
+            }
+            case MULTIPLE_CHOICE: {
+                correct = (
+                        (checkbox1_view.isChecked() != (questionAnswerIdx[0] == stateNumber)) &&
+                                (checkbox2_view.isChecked() != (questionAnswerIdx[1] == stateNumber)) &&
+                                (checkbox3_view.isChecked() != (questionAnswerIdx[2] == stateNumber)) &&
+                                (checkbox4_view.isChecked() != (questionAnswerIdx[3] == stateNumber))
+                );
+                break;
+            }
+            case FREE_TEXT: {
+                String userAnswer = editText_view.getText().toString().toLowerCase();
+                correct = userAnswer.equals(stateNames[stateNumber].toLowerCase());
+                break;
+            }
+        }
+        if (correct) {
+            Toast.makeText(this, "That is correct. Well done!", Toast.LENGTH_SHORT).show();
+            return true;
+        } else {
+            Toast.makeText(this, "Incorrect answer", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+    }
+
+    private void hideSoftKeyboard() {
+        if (getCurrentFocus() != null && getCurrentFocus() instanceof EditText) {
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            if (imm != null) {
+                imm.hideSoftInputFromWindow(editText_view.getWindowToken(), 0);
             }
         }
     }
 
-    public boolean answerCorrect() {
-        /** TODO: Check answers **/
-        return true;
+    /**
+     * returns an int[3] containing possible answers(0 based state number), of
+     * which 1 random position will be the correct answer
+     */
+    private int[] getPossibleAnswers(int correctAnswer) {
+        int[] answerNumber = {-1, -1, -1, -1};
+        int trialNumber = 0;
+        boolean answerAlreadyUsed;
+        /* place correct answer in one of the 4 positions randomly */
+        answerNumber[getRandom(3)] = correctAnswer;
+        for (int i = 0; i < 4; i++) {
+            /* set each answer to a random answer if it is already not set (correct answer was set earlier) */
+            if (answerNumber[i] == -1) {
+                /* -1 denotes answerNumber[i] has not been set yet */
+
+                /* find an answer number that hasn't already been used in this set */
+                answerAlreadyUsed = true;
+                while (answerAlreadyUsed) {
+                    trialNumber = getRandom(stateNames.length);
+                    answerAlreadyUsed = false;
+                    for (int j = 0; j < 4; j++) {
+                        if (answerNumber[j] == trialNumber) {
+                            answerAlreadyUsed = true;
+                        }
+                    }
+                }
+                answerNumber[i] = trialNumber;
+            }
+        }
+        return answerNumber;
     }
 
-    public enum questionTypeENUM {
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putIntArray("totalQuestionsAskedByType", totalQuestionsAskedByType);
+        outState.putInt("numberOfQuestionsAnswered", numberOfQuestionsAnswered);
+        outState.putInt("numberOfQuestionsAnsweredCorrectly", numberOfQuestionsAnsweredCorrectly);
+        outState.putInt("stateNumber", stateNumber);
+        outState.putIntArray("questionAnswerIdx", questionAnswerIdx);
+        outState.putString("questionText", questionText);
+        outState.putStringArray("questionAnswerText", questionAnswerText);
+        outState.putString("scoreText", scoreText);
+        outState.putInt("multipleChoice_view_vis", multipleChoice_view.getVisibility());
+        outState.putInt("singleChoice_view_vis", singleChoice_view.getVisibility());
+        outState.putInt("freeText_view_vis", freeText_view.getVisibility());
+        outState.putInt("question_text_view_vis", question_text_view.getVisibility());
+        outState.putInt("radioButton1_view_vis", radioButton1_view.getVisibility());
+        outState.putInt("radioButton2_view_vis", radioButton2_view.getVisibility());
+        outState.putInt("radioButton3_view_vis", radioButton3_view.getVisibility());
+        outState.putInt("radioButton4_view_vis", radioButton4_view.getVisibility());
+        outState.putInt("singleChoice_view_chk", singleChoice_view.getCheckedRadioButtonId());
+        outState.putInt("checkbox1_view_vis", checkbox1_view.getVisibility());
+        outState.putInt("checkbox2_view_vis", checkbox2_view.getVisibility());
+        outState.putInt("checkbox3_view_vis", checkbox3_view.getVisibility());
+        outState.putInt("checkbox4_view_vis", checkbox4_view.getVisibility());
+        outState.putBoolean("checkbox1_view_chk", checkbox1_view.isChecked());
+        outState.putBoolean("checkbox2_view_chk", checkbox2_view.isChecked());
+        outState.putBoolean("checkbox3_view_chk", checkbox3_view.isChecked());
+        outState.putBoolean("checkbox4_view_chk", checkbox4_view.isChecked());
+        outState.putString("editText_view_txt", editText_view.getText().toString());
+        outState.putInt("editText_view_SelectionStart", editText_view.getSelectionStart());
+        outState.putInt("editText_view_SelectionEnd", editText_view.getSelectionEnd());
+        outState.putInt("quiz_view_vis", quiz_view.getVisibility());
+        outState.putInt("filter_view_vis", filter_view.getVisibility());
+        outState.putInt("scoreboard_view_vis", scoreboard_view.getVisibility());
+        outState.putInt("button_begin_view_vis", button_begin_view.getVisibility());
+        if (scoreText_view.getText().length() > 0) {
+            outState.putString("scoreText_view_txt", scoreText_view.getText().toString());
+        } else {
+            outState.putString("scoreText_view_txt", "");
+        }
+
+        switch (questionType) {
+            case SINGLE_CHOICE:
+                outState.putInt("questionType_int", 0);
+                break;
+            case MULTIPLE_CHOICE:
+                outState.putInt("questionType_int", 1);
+                break;
+            case FREE_TEXT:
+                outState.putInt("questionType_int", 2);
+                break;
+        }
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        // variableData = savedInstanceState.getInt("AStringKey");
+        // variableData2 = savedInstanceState.getString("AStringKey2");
+        totalQuestionsAskedByType = savedInstanceState.getIntArray("totalQuestionsAskedByType");
+        numberOfQuestionsAnswered = savedInstanceState.getInt("numberOfQuestionsAnswered");
+        numberOfQuestionsAnsweredCorrectly = savedInstanceState.getInt("numberOfQuestionsAnsweredCorrectly");
+        stateNumber = savedInstanceState.getInt("stateNumber");
+        questionAnswerIdx = savedInstanceState.getIntArray("questionAnswerIdx");
+        questionText = savedInstanceState.getString("questionText");
+        question_text_view.setText(questionText);
+
+        questionAnswerText = savedInstanceState.getStringArray("questionAnswerText");
+        assert questionAnswerText != null;
+        if (questionAnswerText[0] != null) {
+            checkbox1_view.setText(questionAnswerText[0]);
+            radioButton1_view.setText(questionAnswerText[0]);
+        }
+        if (questionAnswerText[1] != null) {
+            checkbox2_view.setText(questionAnswerText[1]);
+            radioButton2_view.setText(questionAnswerText[1]);
+        }
+        if (questionAnswerText[2] != null) {
+            checkbox3_view.setText(questionAnswerText[2]);
+            radioButton3_view.setText(questionAnswerText[2]);
+        }
+        if (questionAnswerText[3] != null) {
+            checkbox4_view.setText(questionAnswerText[3]);
+            radioButton4_view.setText(questionAnswerText[3]);
+        }
+
+        scoreText = savedInstanceState.getString("scoreText");
+        scoreText_view.setText(scoreText);
+        multipleChoice_view.setVisibility(savedInstanceState.getInt("multipleChoice_view_vis"));
+        singleChoice_view.setVisibility(savedInstanceState.getInt("singleChoice_view_vis"));
+        freeText_view.setVisibility(savedInstanceState.getInt("freeText_view_vis"));
+        question_text_view.setVisibility(savedInstanceState.getInt("question_text_view_vis"));
+
+        radioButton1_view.setVisibility(savedInstanceState.getInt("radioButton1_view_vis"));
+        radioButton2_view.setVisibility(savedInstanceState.getInt("radioButton2_view_vis"));
+        radioButton3_view.setVisibility(savedInstanceState.getInt("radioButton3_view_vis"));
+        radioButton4_view.setVisibility(savedInstanceState.getInt("radioButton4_view_vis"));
+
+        singleChoice_view.check(savedInstanceState.getInt("singleChoice_view_chk"));
+
+        checkbox1_view.setVisibility(savedInstanceState.getInt("checkbox1_view_vis"));
+        checkbox2_view.setVisibility(savedInstanceState.getInt("checkbox2_view_vis"));
+        checkbox3_view.setVisibility(savedInstanceState.getInt("checkbox3_view_vis"));
+        checkbox4_view.setVisibility(savedInstanceState.getInt("checkbox4_view_vis"));
+
+        checkbox1_view.setChecked(savedInstanceState.getBoolean("checkbox1_view_chk"));
+        checkbox2_view.setChecked(savedInstanceState.getBoolean("checkbox2_view_chk"));
+        checkbox3_view.setChecked(savedInstanceState.getBoolean("checkbox3_view_chk"));
+        checkbox4_view.setChecked(savedInstanceState.getBoolean("checkbox4_view_chk"));
+
+        editText_view.setText(savedInstanceState.getString("editText_view_txt"));
+        editText_view.setSelection(savedInstanceState.getInt("editText_view_SelectionStart"), savedInstanceState.getInt("editText_view_SelectionEnd"));
+
+        quiz_view.setVisibility(savedInstanceState.getInt("quiz_view_vis"));
+        filter_view.setVisibility(savedInstanceState.getInt("filter_view_vis"));
+        scoreboard_view.setVisibility(savedInstanceState.getInt("scoreboard_view_vis"));
+        button_begin_view.setVisibility(savedInstanceState.getInt("button_begin_view_vis"));
+        scoreText_view.setVisibility(savedInstanceState.getInt("scoreText_view_vis"));
+        int i = savedInstanceState.getInt("questionType_int");
+        switch (i) {
+            case 0:
+                questionType = questionTypeENUM.SINGLE_CHOICE;
+                break;
+            case 1:
+                questionType = questionTypeENUM.MULTIPLE_CHOICE;
+                break;
+            case 2:
+                questionType = questionTypeENUM.FREE_TEXT;
+                break;
+        }
+    }
+
+    enum questionTypeENUM {
         MULTIPLE_CHOICE, SINGLE_CHOICE, FREE_TEXT
     }
+
 }
+// TODO: Extract all string resources
+// TODO: Cleanup Code
+// TODO: possible localization(s)
