@@ -248,6 +248,7 @@ public class MainActivity extends AppCompatActivity {
      * Hide the  Begin button
      * apply filter to background image
      */
+    @SuppressWarnings("unused")
     public void button_begin_onClick(View view) {
         filter_view.setVisibility(View.VISIBLE);
         scoreboard_view.setVisibility(View.VISIBLE);
@@ -268,6 +269,7 @@ public class MainActivity extends AppCompatActivity {
      * Handles click of the submit_button
      * Used for Submit Answer
      */
+    @SuppressWarnings("unused")
     public void button_answer_onClick(View view) {
         hideSoftKeyboard();
         numberOfQuestionsAnswered++;
