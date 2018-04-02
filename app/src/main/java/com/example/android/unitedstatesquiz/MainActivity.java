@@ -33,11 +33,12 @@ public class MainActivity extends AppCompatActivity {
             "Lincoln", "Carson City", "Concord", "Trenton", "Santa Fe", "Albany", "Raleigh", "Bismark", "Columbus",
             "Oklahoma City", "Salem", "Harrisburg", "Providence", "Columbia", "Pierre", "Nashville", "Austin",
             "Salt Lake City", "Montpelier", "Richmond", "Olympia", "Charleston", "Madison", "Cheyenne"};
+
     private static final int numberOfQuestionsPerQuiz = 5;
-    /*
-     * Initialize the randomNumberClass for our getRandom function
-     */
+
+    // Initialize the randomNumberClass for our getRandom function
     private final Random randomNumberClass = new Random();
+
     private questionTypeENUM questionType = questionTypeENUM.SINGLE_CHOICE;
     private int[] totalQuestionsAskedByType = {0, 0, 0};
     private int numberOfQuestionsAnswered = 0;
@@ -101,15 +102,15 @@ public class MainActivity extends AppCompatActivity {
         scoreText_view.setText("");
     }
 
-    /*
-     * Returns an integer from 0 to upperBound-1
+    /**
+     * Returns an int from 0 to upperBound-1
      */
     private int getRandom(int upperBound) {
         return randomNumberClass.nextInt(upperBound);
     }
 
-    /*
-     * Updates the quiz screen to display the proper fields for a given question
+    /**
+     * Updates the quiz screen to display the proper fields for a random question
      */
     private void showNextQuestion() {
         /* Hide all quiz types */
@@ -186,7 +187,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case MULTIPLE_CHOICE:
                 questionAnswerIdx = getPossibleAnswers(stateNumber);
-                questionText = "Which cities are not the capital of " + stateNames[stateNumber] + "?";
+                questionText = getString(R.string.cities_are_not) + stateNames[stateNumber] + "?";
                 for (int idx = 0; idx < 4; idx++) {
                     questionAnswerText[idx] = capitalNames[questionAnswerIdx[idx]];
                 }
@@ -229,7 +230,7 @@ public class MainActivity extends AppCompatActivity {
                 multipleChoice_view.setVisibility(View.VISIBLE);
                 break;
             case FREE_TEXT:
-                questionText = "Which state's capital is " + capitalNames[stateNumber] + "?";
+                questionText = getString(R.string.capital_of_which) + capitalNames[stateNumber] + "?";
                 question_text_view.setText(questionText);
                 editText_view.setText("");
                 freeText_view.setVisibility(View.VISIBLE);
@@ -242,7 +243,7 @@ public class MainActivity extends AppCompatActivity {
         quiz_view.setVisibility(View.VISIBLE);
     }
 
-    /*
+    /**
      * BEGIN button clicked
      * Hide the  Begin button
      * apply filter to background image
@@ -255,16 +256,17 @@ public class MainActivity extends AppCompatActivity {
         showNextQuestion();
     }
 
+    /**
+     * sets the score text (used for the toasts and the status bar)
+     */
     private void updateScore() {
         scoreText = "Question " + (numberOfQuestionsAnswered + 1 + " of " + numberOfQuestionsPerQuiz);
         scoreText_view.setText(scoreText);
     }
 
-    /*
+    /**
      * Handles click of the submit_button
      * Used for Submit Answer
-     *
-     * @param view
      */
     public void button_answer_onClick(View view) {
         hideSoftKeyboard();
@@ -284,15 +286,15 @@ public class MainActivity extends AppCompatActivity {
             quiz_view.setVisibility(View.GONE);
             button_begin_view.setVisibility(View.VISIBLE);
             scoreboard_view.setVisibility(View.GONE);
-            Toast.makeText(this, scoreText, Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), scoreText, Toast.LENGTH_LONG).show();
         } else {
             showNextQuestion();
         }
     }
 
-    /*
-     * Checks the user's answer(s)
-     * returns TRUE if correct or FALSE if incorrect
+    /**
+     * method to check the users answers for the current question
+     * @return boolean
      */
     private boolean answerCorrect() {
         boolean correct = false;
@@ -328,14 +330,17 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         if (correct) {
-            Toast.makeText(this, "That is correct. Well done!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), R.string.toast_correct, Toast.LENGTH_SHORT).show();
             return true;
         } else {
-            Toast.makeText(this, "Incorrect answer", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), R.string.toast_incorrect, Toast.LENGTH_SHORT).show();
             return false;
         }
     }
 
+    /**
+     * Method to hide the soft keyboard
+     */
     private void hideSoftKeyboard() {
         if (getCurrentFocus() != null && getCurrentFocus() instanceof EditText) {
             InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -346,21 +351,25 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * returns an int[3] containing possible answers(0 based state number), of
-     * which 1 random position will be the correct answer
+     *
+     * @param correctAnswer
+     *           The value to store in the random position in the results
+     * @return int[3]
+     *           Contains 4 possible answers(0 based state number)
+     *           the correct answer will be placed into one of the 4
+     *           answers at random.
      */
     private int[] getPossibleAnswers(int correctAnswer) {
         int[] answerNumber = {-1, -1, -1, -1};
         int trialNumber = 0;
         boolean answerAlreadyUsed;
-        /* place correct answer in one of the 4 positions randomly */
+        // place correct answer in one of the 4 positions randomly
         answerNumber[getRandom(3)] = correctAnswer;
         for (int i = 0; i < 4; i++) {
-            /* set each answer to a random answer if it is already not set (correct answer was set earlier) */
+            // set each answer to a random answer if it is already not set (correct answer was set earlier)
             if (answerNumber[i] == -1) {
-                /* -1 denotes answerNumber[i] has not been set yet */
 
-                /* find an answer number that hasn't already been used in this set */
+                // find an answer number that hasn't already been used in this set
                 answerAlreadyUsed = true;
                 while (answerAlreadyUsed) {
                     trialNumber = getRandom(stateNames.length);
@@ -512,8 +521,4 @@ public class MainActivity extends AppCompatActivity {
     enum questionTypeENUM {
         MULTIPLE_CHOICE, SINGLE_CHOICE, FREE_TEXT
     }
-
 }
-// TODO: Extract all string resources
-// TODO: Cleanup Code
-// TODO: possible localization(s)
