@@ -1,3 +1,18 @@
 <resources>
+    // Characters that need escaping: \ . [ ] { } ( ) * + - ? ^ $ |
     <string name="app_name">United States Quiz</string>
+    <string name="cities_are_not">Which cities are not the capital of</string>
+    <string name="capital_of_which">Which state\'s capital is</string>
+    <string name="toast_correct">That is correct\. Well done\!</string>
+    <string name="toast_incorrect">Incorrect answer</string>
+    <string name="capital_view">Capital View</string>
+    <string name="progress_0_of_10">Progress\\: 0 of 10</string>
+    <string name="begin">Begin</string>
+    <string name="this_is_the_question">This is the question</string>
+    <string name="answer_a">Answer A</string>
+    <string name="answer_b">Answer B</string>
+    <string name="answer_c">Answer C</string>
+    <string name="answer_d">Answer D</string>
+    <string name="your_answer">Your answer\\. \\. \\.</string>
+    <string name="submit_answer">Submit Answer</string>
 </resources>

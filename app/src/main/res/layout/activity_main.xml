@@ -8,7 +8,7 @@
         android:id="@+id/quiz_background"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:contentDescription="Capital View"
+        android:contentDescription="@string/capital_view"
         android:scaleType="centerCrop"
         android:src="@drawable/capital_portrait" />
 
@@ -38,7 +38,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="Progress: 0 of 10"
+            android:text="@string/progress_0_of_10"
             android:textColor="#ffffff" />
     </LinearLayout>
 
@@ -51,7 +51,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="24dp"
         android:onClick="button_begin_onClick"
-        android:text="Begin" />
+        android:text="@string/begin" />
 
     <!-- Quiz panel hidden/shown by code -->
     <LinearLayout
@@ -70,7 +70,7 @@
             android:layout_marginBottom="24dp"
             android:layout_marginLeft="24dp"
             android:layout_marginRight="24dp"
-            android:text="This is the question"
+            android:text="@string/this_is_the_question"
             android:textAlignment="center"
             android:textSize="24sp"
             android:textStyle="bold" />
@@ -90,25 +90,25 @@
                 android:id="@+id/radio_button_1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Answer A" />
+                android:text="@string/answer_a" />
 
             <RadioButton
                 android:id="@+id/radio_button_2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Answer B" />
+                android:text="@string/answer_b" />
 
             <RadioButton
                 android:id="@+id/radio_button_3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Answer C" />
+                android:text="@string/answer_c" />
 
             <RadioButton
                 android:id="@+id/radio_button_4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Answer D" />
+                android:text="@string/answer_d" />
         </RadioGroup>
 
         <!-- MULTIPLE_CHOICE view -->
@@ -126,25 +126,25 @@
                 android:id="@+id/checkbox_1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Answer A" />
+                android:text="@string/answer_a" />
 
             <CheckBox
                 android:id="@+id/checkbox_2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Answer B" />
+                android:text="@string/answer_b" />
 
             <CheckBox
                 android:id="@+id/checkbox_3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Answer C" />
+                android:text="@string/answer_c" />
 
             <CheckBox
                 android:id="@+id/checkbox_4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Answer D" />
+                android:text="@string/answer_d" />
         </LinearLayout>
 
         <!-- FREE_TEXT view -->
@@ -162,7 +162,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="#90CAF9"
-                android:hint="Your answer. . ."
+                android:hint="@string/your_answer"
                 android:inputType="textCapWords"
                 android:paddingLeft="8dp"
                 android:paddingRight="8dp"
@@ -180,11 +180,15 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
+                android:layout_marginEnd="24dp"
                 android:layout_marginRight="24dp"
+                android:background="@color/colorPrimary"
                 android:onClick="button_answer_onClick"
                 android:tag="answer"
-                android:text="Submit Answer" />
+                android:text="@string/submit_answer"
+                android:textColor="@color/colorAccent" />
 
         </RelativeLayout>
     </LinearLayout>
 </RelativeLayout>
+

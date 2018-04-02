@@ -186,7 +186,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case MULTIPLE_CHOICE:
                 questionAnswerIdx = getPossibleAnswers(stateNumber);
-                questionText = "Which cities are not the capital of " + stateNames[stateNumber] + "?";
+                questionText = getString(R.string.cities_are_not) + stateNames[stateNumber] + "?";
                 for (int idx = 0; idx < 4; idx++) {
                     questionAnswerText[idx] = capitalNames[questionAnswerIdx[idx]];
                 }
@@ -229,7 +229,7 @@ public class MainActivity extends AppCompatActivity {
                 multipleChoice_view.setVisibility(View.VISIBLE);
                 break;
             case FREE_TEXT:
-                questionText = "Which state's capital is " + capitalNames[stateNumber] + "?";
+                questionText = getString(R.string.capital_of_which) + capitalNames[stateNumber] + "?";
                 question_text_view.setText(questionText);
                 editText_view.setText("");
                 freeText_view.setVisibility(View.VISIBLE);
@@ -247,6 +247,7 @@ public class MainActivity extends AppCompatActivity {
      * Hide the  Begin button
      * apply filter to background image
      */
+    @SuppressWarnings("unused")
     public void button_begin_onClick(View view) {
         filter_view.setVisibility(View.VISIBLE);
         scoreboard_view.setVisibility(View.VISIBLE);
@@ -266,6 +267,7 @@ public class MainActivity extends AppCompatActivity {
      *
      * @param view
      */
+    @SuppressWarnings("unused")
     public void button_answer_onClick(View view) {
         hideSoftKeyboard();
         numberOfQuestionsAnswered++;
@@ -284,7 +286,7 @@ public class MainActivity extends AppCompatActivity {
             quiz_view.setVisibility(View.GONE);
             button_begin_view.setVisibility(View.VISIBLE);
             scoreboard_view.setVisibility(View.GONE);
-            Toast.makeText(this, scoreText, Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), scoreText, Toast.LENGTH_LONG).show();
         } else {
             showNextQuestion();
         }
@@ -328,10 +330,10 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         if (correct) {
-            Toast.makeText(this, "That is correct. Well done!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), R.string.toast_correct, Toast.LENGTH_SHORT).show();
             return true;
         } else {
-            Toast.makeText(this, "Incorrect answer", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), R.string.toast_incorrect, Toast.LENGTH_SHORT).show();
             return false;
         }
     }
