@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">" Prueba de los Estados Unidos"</string>
+    <string name="cities_are_not">" ¿Qué ciudades no son la capital de "</string>
+    <string name="capital_of_which">" Qué capital del estado es "</string>
+    <string name="toast_correct">Eso es correcto\\. ¡Bien hecho!</string>
+    <string name="toast_incorrect">" Respuesta incorrecta"</string>
+    <string name="capital_view">" Vista de Capital"</string>
+    <string name="progress_0_of_10">" Progreso \\: 0 de 10"</string>
+    <string name="begin">" Empezar"</string>
+    <string name="this_is_the_question">" Esta es la pregunta"</string>
+    <string name="answer_a">" Respuesta A"</string>
+    <string name="answer_b">" Respuesta B"</string>
+    <string name="answer_c">" Respuesta C"</string>
+    <string name="answer_d">" Respuesta D"</string>
+    <string name="your_answer">" Tu respuesta\\. \\. \\."</string>
+    <string name="submit_answer">" Enviar respuesta"</string>
+</resources>

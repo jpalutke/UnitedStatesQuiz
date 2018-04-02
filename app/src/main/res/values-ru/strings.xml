@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Викторина Соединенных Штатов</string>
+    <string name="your_answer">" Ваш ответ\\. \\. \\."</string>
+    <string name="capital_of_which">" Какой капитал государства "</string>
+    <string name="cities_are_not">" Какие города не являются столицей "</string>
+    <string name="this_is_the_question">" Это вопрос"</string>
+    <string name="toast_correct">Это верно\\. Отлично сработано!</string>
+    <string name="submit_answer">" Отправить ответ"</string>
+    <string name="progress_0_of_10">" Прогресс \\: 0 из 10"</string>
+    <string name="toast_incorrect">" Неправильный ответ"</string>
+    <string name="capital_view">" Просмотр капитала"</string>
+    <string name="begin">" Начать"</string>
+    <string name="answer_d">Ответ D</string>
+    <string name="answer_c">" Ответ C"</string>
+    <string name="answer_b">Ответ B</string>
+    <string name="answer_a">Ответ A</string>
+</resources>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">" Quiz des États-Unis"</string>
+    <string name="cities_are_not">"Quelles villes ne sont pas la capitale de "</string>
+    <string name="capital_of_which">" Le capital de quel état est "</string>
+    <string name="toast_incorrect">" Réponse incorrecte"</string>
+    <string name="capital_view">" Capital View"</string>
+    <string name="progress_0_of_10">" Progress \\: 0 de 10"</string>
+    <string name="your_answer">" Ta Réponse\\. \\. \\."</string>
+    <string name="this_is_the_question">" Ceci est la question"</string>
+    <string name="toast_correct">" C'est correct \\. Bien joué!"</string>
+    <string name="submit_answer">" Envoyer une réponse"</string>
+    <string name="begin">" Commencer"</string>
+    <string name="answer_d">" Réponse D"</string>
+    <string name="answer_c">" Réponse C"</string>
+    <string name="answer_b">" Réponse B"</string>
+    <string name="answer_a">" Réponse A"</string>
+</resources>

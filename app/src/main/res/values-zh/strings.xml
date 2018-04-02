@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">美国测验</string>
+    <string name="your_answer">" 你的答案\\。 \\。 \\。"</string>
+    <string name="capital_of_which">" 哪个州的首府是 "</string>
+    <string name="cities_are_not">" 哪些城市不是首都 "</string>
+    <string name="this_is_the_question">" 这是个问题"</string>
+    <string name="toast_correct">" 那是对的\\。做得好！"</string>
+    <string name="submit_answer">" 提交答案"</string>
+    <string name="progress_0_of_10">" 进度\\：0之10"</string>
+    <string name="toast_incorrect">" 不正确的答案"</string>
+    <string name="capital_view">" 资本观点"</string>
+    <string name="begin">" 开始"</string>
+    <string name="answer_d">" 答案D"</string>
+    <string name="answer_c">" 答案C"</string>
+    <string name="answer_b">" 答案B"</string>
+    <string name="answer_a">答案A</string>
+</resources>
