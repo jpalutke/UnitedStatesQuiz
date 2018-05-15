@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
             "Oklahoma City", "Salem", "Harrisburg", "Providence", "Columbia", "Pierre", "Nashville", "Austin",
             "Salt Lake City", "Montpelier", "Richmond", "Olympia", "Charleston", "Madison", "Cheyenne"};
 
-    private static final int numberOfQuestionsPerQuiz = 5;
+    private static final int numberOfQuestionsPerQuiz = 10;
 
     // Initialize the randomNumberClass for our getRandom function
     private final Random randomNumberClass = new Random();
@@ -48,6 +48,8 @@ public class MainActivity extends AppCompatActivity {
     private String questionText = "";
     private String[] questionAnswerText = {"", "", "", ""};
     private String scoreText = "";
+
+    // These are the view groups to be hidden/shown depending on question type
     private View multipleChoice_view;
     private RadioGroup singleChoice_view;
     private View freeText_view;
@@ -98,12 +100,12 @@ public class MainActivity extends AppCompatActivity {
         filter_view = findViewById(R.id.background_filter);
         scoreboard_view = findViewById(R.id.status_bar);
         button_begin_view = findViewById(R.id.button_begin);
-        scoreText_view = findViewById(R.id.score_text);
+        scoreText_view = findViewById(R.id.progress_text);
         scoreText_view.setText("");
     }
 
     /**
-     * Returns an int from 0 to upperBound-1
+     * Returns a random int from 0 to upperBound-1
      */
     private int getRandom(int upperBound) {
         return randomNumberClass.nextInt(upperBound);
@@ -142,6 +144,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
 
+        /* Toggle proper visibilities and question/answer values */
         switch (questionType) {
             case SINGLE_CHOICE:
                 questionAnswerIdx = getPossibleAnswers(stateNumber);
@@ -239,7 +242,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
 
-    /* Show quiz panel */
+        /* Show quiz panel */
         quiz_view.setVisibility(View.VISIBLE);
     }
 
@@ -248,7 +251,6 @@ public class MainActivity extends AppCompatActivity {
      * Hide the  Begin button
      * apply filter to background image
      */
-    @SuppressWarnings("unused")
     public void button_begin_onClick(View view) {
         filter_view.setVisibility(View.VISIBLE);
         scoreboard_view.setVisibility(View.VISIBLE);
@@ -269,7 +271,6 @@ public class MainActivity extends AppCompatActivity {
      * Handles click of the submit_button
      * Used for Submit Answer
      */
-    @SuppressWarnings("unused")
     public void button_answer_onClick(View view) {
         hideSoftKeyboard();
         numberOfQuestionsAnswered++;
@@ -296,6 +297,7 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * method to check the users answers for the current question
+     *
      * @return boolean
      */
     private boolean answerCorrect() {
@@ -353,13 +355,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     *
-     * @param correctAnswer
-     *           The value to store in the random position in the results
+     * @param correctAnswer The value to store in the random position in the results
      * @return int[3]
-     *           Contains 4 possible answers(0 based state number)
-     *           the correct answer will be placed into one of the 4
-     *           answers at random.
+     * Contains 4 possible answers(0 based state number)
+     * the correct answer will be placed into one of the 4
+     * answers at random.
      */
     private int[] getPossibleAnswers(int correctAnswer) {
         int[] answerNumber = {-1, -1, -1, -1};
